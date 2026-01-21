@@ -1,5 +1,7 @@
 import axios from "axios";
 import type { AxiosError, AxiosInstance } from "axios";
+import { authFacade } from "../state/authFacade";
+
 
 
 /**
@@ -26,10 +28,8 @@ export const httpClient: AxiosInstance = axios.create({
 
 
 function getAccessToken(): string | null {
-  // ...
-  return null;
+  return authFacade.getAccessToken();
 }
-
 
 httpClient.interceptors.request.use((config) => {
   const token = getAccessToken();
