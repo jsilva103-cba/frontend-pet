@@ -1,1 +1,2 @@
-export * from "./petspage";
+export { PetsPage } from "./petspage";
+

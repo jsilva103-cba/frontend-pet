@@ -2,20 +2,15 @@ import axios from "axios";
 import type { AxiosError, AxiosInstance } from "axios";
 import { authFacade } from "../state/authFacade";
 
-
-
 /**
- * Cliente HTTP.
+ * Cliente HTTP
  */
 
-// Base URL 
+// Base URL
 const baseURL = import.meta.env.VITE_API_BASE_URL as string;
 
 if (!baseURL) {
-  // Não é para parar a app.
-  console.warn(
-    "[httpClient] VITE_API_BASE_URL não definido. erro .env."
-  );
+  console.warn("[httpClient] VITE_API_BASE_URL não definido. Verifique o .env");
 }
 
 export const httpClient: AxiosInstance = axios.create({
@@ -26,27 +21,45 @@ export const httpClient: AxiosInstance = axios.create({
   },
 });
 
-
 function getAccessToken(): string | null {
-  return authFacade.getAccessToken();
+ 
+  try {
+    const token = authFacade.getAccessToken?.();
+    if (token) return token;
+  } catch {
+    
+  }
+
+
+  try {
+    const raw = localStorage.getItem("pet_registry_tokens");
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw) as any;
+
+     return parsed?.access_token ?? parsed?.accessToken ?? null;
+  } catch {
+    return null;
+  }
 }
 
 httpClient.interceptors.request.use((config) => {
   const token = getAccessToken();
 
+  config.headers = config.headers ?? {};
+
   if (token) {
-    config.headers = config.headers ?? {};
     config.headers.Authorization = `Bearer ${token}`;
+  } else {
+    delete (config.headers as any).Authorization;
   }
 
   return config;
 });
 
-
 httpClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-//...
     return Promise.reject(error);
   }
 );

@@ -1,5 +1,5 @@
 import { httpClient } from "./httpClient";
-import { API } from "./api";
+import { API } from "../config/api";
 import type { Pet } from "../models/pet";
 
 /**
