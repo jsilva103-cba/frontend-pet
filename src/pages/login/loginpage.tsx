@@ -18,10 +18,16 @@ export function LoginPage() {
     try {
       setLoading(true);
 
-            await authFacade.login({ username, password });
+      // Faz login
+      await authFacade.login({ username, password });
 
-      // Login OK: manda para a listagem de pets
-      navigate("/pets");
+      await authFacade.login({ username, password });
+      window.dispatchEvent(new Event("auth:changed"));
+      navigate("/pets", { replace: true });
+
+  
+      // Redireciona para /pets
+      navigate("/pets", { replace: true });
     } catch (err) {
       setError("Falha no login. Verifique usuário e senha e tente novamente.");
       console.error("[LoginPage] Erro no login:", err);
@@ -78,10 +84,6 @@ export function LoginPage() {
             >
               {loading ? "Entrando..." : "Entrar"}
             </button>
-
-            <p className="text-xs text-gray-500">
-             
-            </p>
           </form>
         </div>
       </div>

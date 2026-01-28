@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
-
+import { ProtectedRoute } from "./ProtectedRoute";
 
 const LoginPage = lazy(() =>
   import("../pages/login").then((m) => ({ default: m.LoginPage }))
@@ -24,18 +24,20 @@ export function AppRoutes() {
       }
     >
       <Routes>
-        {/*inicial*/}
-        <Route path="/" element={<Navigate to="/pets" replace />} />
-
-        {/*publica*/}
+        {/* público */}
         <Route path="/login" element={<LoginPage />} />
 
-        {/*telas*/}
-        <Route path="/pets" element={<PetsPage />} />
-        <Route path="/tutores" element={<TutoresPage />} />
+        {/* raiz: ) */}
+        <Route path="/" element={<Navigate to="/pets" replace />} />
 
-        {/*invalida*/}
-        <Route path="*" element={<Navigate to="/pets" replace />} />
+        {/* telas protegidas */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/pets" element={<PetsPage />} />
+          <Route path="/tutores" element={<TutoresPage />} />
+        </Route>
+
+        {/* inválida:*/}
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Suspense>
   );
