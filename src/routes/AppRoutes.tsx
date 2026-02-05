@@ -14,6 +14,13 @@ const TutoresPage = lazy(() =>
   import("../pages/tutores").then((m) => ({ default: m.TutoresPage }))
 );
 
+const PetDetailsPage = lazy(() =>
+  import("../pages/pets/details/PetDetailsPage").then((m) => ({
+    default: m.PetDetailsPage,
+  }))
+);
+
+
 export function AppRoutes() {
   return (
     <Suspense
@@ -27,17 +34,18 @@ export function AppRoutes() {
         {/* público */}
         <Route path="/login" element={<LoginPage />} />
 
-        {/* raiz: ) */}
+        {/* raiz */}
         <Route path="/" element={<Navigate to="/pets" replace />} />
 
-        {/* telas protegidas */}
+        {/* protegidas */}
         <Route element={<ProtectedRoute />}>
           <Route path="/pets" element={<PetsPage />} />
+          <Route path="/pets/:id" element={<PetDetailsPage />} />
           <Route path="/tutores" element={<TutoresPage />} />
         </Route>
 
-        {/* inválida:*/}
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        {/* fallback */}
+        <Route path="*" element={<Navigate to="/pets" replace />} />
       </Routes>
     </Suspense>
   );
