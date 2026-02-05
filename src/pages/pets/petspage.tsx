@@ -20,7 +20,6 @@ export function PetsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  
   const [debouncedSearch, setDebouncedSearch] = useState(search);
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(search), 350);
@@ -55,10 +54,8 @@ export function PetsPage() {
     setPage(1);
   }, [debouncedSearch]);
 
-  
   useEffect(() => {
     void load(page, debouncedSearch);
-  
   }, [page, debouncedSearch]);
 
   const totalPages = useMemo(() => {
@@ -81,23 +78,19 @@ export function PetsPage() {
     navigate(`/pets/${String(id)}`);
   }
 
-  
   const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) || "";
 
   function normalizeImageUrl(url: any) {
     if (!url) return null;
     const s = String(url);
 
-  
     if (s.startsWith("http://") || s.startsWith("https://")) return s;
 
-  
     if (!API_BASE) return s;
     return `${API_BASE.replace(/\/$/, "")}/${s.replace(/^\//, "")}`;
   }
 
   function resolvePetImage(p: any) {
-  
     const direct =
       p?.fotoUrl ??
       p?.foto_url ??
@@ -108,7 +101,6 @@ export function PetsPage() {
       p?.foto?.path ??
       null;
 
-  
     const fromArray =
       Array.isArray(p?.fotos) && p.fotos.length > 0
         ? p.fotos[0]?.url ??
@@ -117,13 +109,10 @@ export function PetsPage() {
           p.fotos[0]
         : null;
 
-  
-    const maybe =
-      direct ?? fromArray ?? p?.foto ?? p?.fotoId ?? p?.idFoto ?? null;
+    const maybe = direct ?? fromArray ?? p?.foto ?? p?.fotoId ?? p?.idFoto ?? null;
 
     return normalizeImageUrl(maybe);
   }
-  
 
   return (
     <div className="mx-auto max-w-5xl p-6" aria-busy={loading}>
@@ -147,6 +136,13 @@ export function PetsPage() {
             className="rounded-lg border bg-white px-3 py-2 text-sm font-medium hover:bg-gray-50 disabled:opacity-60"
           >
             {loading ? "Carregando..." : "Recarregar"}
+          </button>
+
+          <button
+            onClick={() => navigate("/pets/novo")}
+            className="rounded-lg border bg-black px-3 py-2 text-sm font-medium text-white hover:opacity-90"
+          >
+            Novo Pet
           </button>
         </div>
       </div>
@@ -176,9 +172,7 @@ export function PetsPage() {
       </div>
 
       {loading && (
-        <div className="rounded-lg border bg-white p-4 text-gray-600">
-          Carregando...
-        </div>
+        <div className="rounded-lg border bg-white p-4 text-gray-600">Carregando...</div>
       )}
 
       {!loading && error && (
@@ -219,22 +213,24 @@ export function PetsPage() {
                           className="h-full w-full object-cover"
                           loading="lazy"
                           onError={(e) => {
+                            // esconde a imagem quebrada e mostra fallback abaixo
                             e.currentTarget.style.display = "none";
+                            const fb = e.currentTarget.parentElement?.querySelector(
+                              '[data-fallback="1"]'
+                            ) as HTMLElement | null;
+                            if (fb) fb.style.display = "flex";
                           }}
                         />
                       ) : null}
 
-                      {!fotoUrl && (
-                        <div className="flex h-full w-full items-center justify-center text-xs text-gray-500">
-                          Sem foto
-                        </div>
-                      )}
-
-                      {fotoUrl && (
-                        <div className="flex h-full w-full items-center justify-center text-xs text-gray-500">
-                          Sem foto
-                        </div>
-                      )}
+                      {/* fallback: começa escondido e só aparece se não tiver foto ou quebrar */}
+                      <div
+                        data-fallback="1"
+                        style={{ display: fotoUrl ? "none" : "flex" }}
+                        className="h-full w-full items-center justify-center text-xs text-gray-500"
+                      >
+                        Sem foto
+                      </div>
                     </div>
 
                     <div className="min-w-0 flex-1">
@@ -242,9 +238,7 @@ export function PetsPage() {
                       <p className="mt-0.5 text-sm text-gray-600">
                         {String(especie)} • Idade: {String(idade)}
                       </p>
-                      <p className="mt-2 text-xs text-gray-500">
-                        Clique para ver detalhes →
-                      </p>
+                      <p className="mt-2 text-xs text-gray-500">Clique para ver detalhes →</p>
                     </div>
                   </div>
                 </button>

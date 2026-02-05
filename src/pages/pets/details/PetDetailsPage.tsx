@@ -16,6 +16,9 @@ export function PetDetailsPage() {
 
   const [imgError, setImgError] = useState(false);
 
+  // ✅ excluir
+  const [loadingDelete, setLoadingDelete] = useState(false);
+
   const petId = useMemo(() => (id ? String(id) : ""), [id]);
 
   function pickFirstTruthy(...vals: any[]) {
@@ -26,7 +29,13 @@ export function PetDetailsPage() {
   }
 
   function extractEmbeddedTutor(p: any): Tutor | null {
-    const t = p?.tutor ?? p?.tutorInfo ?? p?.responsavel ?? p?.dono ?? p?.owner ?? null;
+    const t =
+      p?.tutor ??
+      p?.tutorInfo ??
+      p?.responsavel ??
+      p?.dono ??
+      p?.owner ??
+      null;
     if (!t || typeof t !== "object") return null;
 
     const hasUseful =
@@ -71,7 +80,6 @@ export function PetDetailsPage() {
 
   // Foto
   function extractPhotoValue(p: any) {
-    
     const direct = pickFirstTruthy(
       p?.fotoUrl,
       p?.foto_url,
@@ -81,10 +89,8 @@ export function PetDetailsPage() {
     );
     if (typeof direct === "string") return direct;
 
-    
     if (typeof p?.foto === "string") return p.foto;
 
-    
     const obj = p?.foto;
     if (obj && typeof obj === "object") {
       const fromObj = pickFirstTruthy(
@@ -102,23 +108,20 @@ export function PetDetailsPage() {
       if (typeof fromObj === "string") return fromObj;
     }
 
-    
     const nested = pickFirstTruthy(p?.foto?.url, p?.foto?.path, p?.foto?.src);
     if (typeof nested === "string") return nested;
 
     return null;
   }
-  
+
   const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) || "";
 
   function normalizeImageUrl(url: any) {
     if (!url) return null;
     const s = String(url);
 
-  
     if (s.startsWith("http://") || s.startsWith("https://")) return s;
 
-  
     try {
       const origin = new URL(API_BASE).origin;
 
@@ -129,7 +132,6 @@ export function PetDetailsPage() {
       return `${API_BASE.replace(/\/$/, "")}/${s.replace(/^\//, "")}`;
     }
   }
-  
 
   function formatPhoneBR(value: any) {
     if (value == null) return "—";
@@ -198,9 +200,12 @@ export function PetDetailsPage() {
   const nome = (pet as any)?.nome ?? "Sem nome";
   const especie = (pet as any)?.especie ?? (pet as any)?.tipo ?? "—";
   const raca = (pet as any)?.raca ?? "—";
-  const idade = (pet as any)?.idade ?? (pet as any)?.idadeEmAnos ?? (pet as any)?.anos ?? "—";
+  const idade =
+    (pet as any)?.idade ??
+    (pet as any)?.idadeEmAnos ??
+    (pet as any)?.anos ??
+    "—";
 
-  
   const fotoUrlRaw = extractPhotoValue(pet as any);
   const fotoUrl = normalizeImageUrl(fotoUrlRaw);
 
@@ -218,27 +223,75 @@ export function PetDetailsPage() {
 
   const tutorContato = formatPhoneBR(tutorContatoRaw);
 
+  // ✅ ações
+  function handleEdit() {
+    if (!petId) return;
+    navigate(`/pets/${petId}/editar`);
+  }
+
+  async function handleDelete() {
+    if (!petId) return;
+
+    const ok = window.confirm(
+      `Tem certeza que deseja excluir o pet "${nome}"?\n\nEssa ação não pode ser desfeita.`
+    );
+    if (!ok) return;
+
+    try {
+      setLoadingDelete(true);
+      await petsService.remove(petId);
+      navigate("/pets", { replace: true });
+    } catch (e) {
+      console.error("[PetDetailsPage] erro ao excluir:", e);
+      setError("Não foi possível excluir o pet. Tente novamente.");
+    } finally {
+      setLoadingDelete(false);
+    }
+  }
+
   return (
     <div className="mx-auto max-w-5xl p-6">
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold">
             Detalhes do Pet{" "}
-            <span className="text-base font-normal text-gray-500">#{petId || "—"}</span>
+            <span className="text-base font-normal text-gray-500">
+              #{petId || "—"}
+            </span>
           </h1>
           <p className="text-sm text-gray-600">Informações completas</p>
         </div>
 
-        <button
-          onClick={() => navigate(-1)}
-          className="rounded-lg border bg-white px-3 py-2 text-sm font-medium hover:bg-gray-50"
-        >
-          Voltar
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleEdit}
+            disabled={loading || !petId}
+            className="rounded-lg border bg-white px-3 py-2 text-sm font-medium hover:bg-gray-50 disabled:opacity-60"
+          >
+            Editar
+          </button>
+
+          <button
+            onClick={handleDelete}
+            disabled={loading || loadingDelete || !petId}
+            className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-100 disabled:opacity-60"
+          >
+            {loadingDelete ? "Excluindo..." : "Excluir"}
+          </button>
+
+          <button
+            onClick={() => navigate(-1)}
+            className="rounded-lg border bg-white px-3 py-2 text-sm font-medium hover:bg-gray-50"
+          >
+            Voltar
+          </button>
+        </div>
       </div>
 
       {loading && (
-        <div className="rounded-lg border bg-white p-4 text-gray-600">Carregando...</div>
+        <div className="rounded-lg border bg-white p-4 text-gray-600">
+          Carregando...
+        </div>
       )}
 
       {!loading && error && (
@@ -307,7 +360,9 @@ export function PetDetailsPage() {
               <p className="text-lg font-semibold">Tutor</p>
 
               {!tutor ? (
-                <p className="mt-2 text-sm text-gray-600">Nenhum tutor vinculado.</p>
+                <p className="mt-2 text-sm text-gray-600">
+                  Nenhum tutor vinculado.
+                </p>
               ) : (
                 <div className="mt-3 grid gap-2 text-sm">
                   <div className="flex justify-between gap-3">

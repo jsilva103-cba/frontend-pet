@@ -20,6 +20,17 @@ const PetDetailsPage = lazy(() =>
   }))
 );
 
+const PetCreatePage = lazy(() =>
+  import("../pages/pets/create").then((m) => ({
+    default: m.PetCreatePage,
+  }))
+);
+
+const PetEditPage = lazy(() =>
+  import("../pages/pets/edit").then((m) => ({
+    default: m.PetEditPage,
+  }))
+);
 
 export function AppRoutes() {
   return (
@@ -40,6 +51,11 @@ export function AppRoutes() {
         {/* protegidas */}
         <Route element={<ProtectedRoute />}>
           <Route path="/pets" element={<PetsPage />} />
+
+          {/* CRUD */}
+          <Route path="/pets/novo" element={<PetCreatePage />} />
+          <Route path="/pets/:id/editar" element={<PetEditPage />} />
+
           <Route path="/pets/:id" element={<PetDetailsPage />} />
           <Route path="/tutores" element={<TutoresPage />} />
         </Route>

@@ -8,7 +8,10 @@ export const API = {
   },
   pets: {
     list: "/v1/pets",
+    create: "/v1/pets",
     byId: (id: string) => `/v1/pets/${id}`,
+    update: (id: string) => `/v1/pets/${id}`,
+    remove: (id: string) => `/v1/pets/${id}`,
     uploadFoto: (id: string) => `/v1/pets/${id}/fotos`,
   },
   tutores: {
