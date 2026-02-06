@@ -16,7 +16,6 @@ export function PetDetailsPage() {
 
   const [imgError, setImgError] = useState(false);
 
-  // ✅ excluir
   const [loadingDelete, setLoadingDelete] = useState(false);
 
   const petId = useMemo(() => (id ? String(id) : ""), [id]);

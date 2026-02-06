@@ -10,12 +10,8 @@ const PetsPage = lazy(() =>
   import("../pages/pets").then((m) => ({ default: m.PetsPage }))
 );
 
-const TutoresPage = lazy(() =>
-  import("../pages/tutores").then((m) => ({ default: m.TutoresPage }))
-);
-
 const PetDetailsPage = lazy(() =>
-  import("../pages/pets/details/PetDetailsPage").then((m) => ({
+  import("../pages/pets/details").then((m) => ({
     default: m.PetDetailsPage,
   }))
 );
@@ -32,6 +28,30 @@ const PetEditPage = lazy(() =>
   }))
 );
 
+const TutoresPage = lazy(() =>
+  import("../pages/tutores").then((m) => ({
+    default: m.TutoresPage,
+  }))
+);
+
+const TutorDetailsPage = lazy(() =>
+  import("../pages/tutores/details").then((m) => ({
+    default: m.TutorDetailsPage,
+  }))
+);
+
+const TutorCreatePage = lazy(() =>
+  import("../pages/tutores/create").then((m) => ({
+    default: m.TutorCreatePage,
+  }))
+);
+
+const TutorEditPage = lazy(() =>
+  import("../pages/tutores/edit").then((m) => ({
+    default: m.TutorEditPage,
+  }))
+);
+
 export function AppRoutes() {
   return (
     <Suspense
@@ -42,25 +62,21 @@ export function AppRoutes() {
       }
     >
       <Routes>
-        {/* público */}
         <Route path="/login" element={<LoginPage />} />
-
-        {/* raiz */}
         <Route path="/" element={<Navigate to="/pets" replace />} />
 
-        {/* protegidas */}
         <Route element={<ProtectedRoute />}>
           <Route path="/pets" element={<PetsPage />} />
-
-          {/* CRUD */}
           <Route path="/pets/novo" element={<PetCreatePage />} />
+          <Route path="/pets/:id" element={<PetDetailsPage />} />
           <Route path="/pets/:id/editar" element={<PetEditPage />} />
 
-          <Route path="/pets/:id" element={<PetDetailsPage />} />
           <Route path="/tutores" element={<TutoresPage />} />
+          <Route path="/tutores/novo" element={<TutorCreatePage />} />
+          <Route path="/tutores/:id" element={<TutorDetailsPage />} />
+          <Route path="/tutores/:id/editar" element={<TutorEditPage />} />
         </Route>
 
-        {/* fallback */}
         <Route path="*" element={<Navigate to="/pets" replace />} />
       </Routes>
     </Suspense>

@@ -11,7 +11,7 @@ type Props = {
 };
 
 function toNumberSafe(v: any): number {
-  // pega somente dígitos
+  // somente dígitos
   const n = Number(String(v ?? "").replace(/[^\d]/g, ""));
   return Number.isFinite(n) ? n : 0;
 }
@@ -32,7 +32,7 @@ export function PetForm({
   );
   const [raca, setRaca] = useState(String((initial as any)?.raca ?? ""));
 
-  // Foto escolhida para upload 
+  // foto up 
   const [photo, setPhoto] = useState<File | null>(null);
 
 

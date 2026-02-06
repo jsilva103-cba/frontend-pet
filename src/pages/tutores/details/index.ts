@@ -1,0 +1,1 @@
+export { TutorDetailsPage } from "./TutorDetailsPage";

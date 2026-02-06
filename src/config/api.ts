@@ -15,10 +15,15 @@ export const API = {
     uploadFoto: (id: string) => `/v1/pets/${id}/fotos`,
   },
   tutores: {
+    list: "/v1/tutores",
     create: "/v1/tutores",
     byId: (id: string) => `/v1/tutores/${id}`,
+    update: (id: string) => `/v1/tutores/${id}`,
+    remove: (id: string) => `/v1/tutores/${id}`,
     uploadFoto: (id: string) => `/v1/tutores/${id}/fotos`,
     vincularPet: (tutorId: string, petId: string) =>
+      `/v1/tutores/${tutorId}/pets/${petId}`,
+    desvincularPet: (tutorId: string, petId: string) =>
       `/v1/tutores/${tutorId}/pets/${petId}`,
   },
 } as const;

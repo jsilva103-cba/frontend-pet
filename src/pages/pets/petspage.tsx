@@ -4,7 +4,7 @@ import type { Pet } from "../../models/pet";
 import { petsService } from "../../services/petsService";
 
 /**
- * Lista Pets (paginação + busca)
+ * Lista Pets 
  */
 export function PetsPage() {
   const navigate = useNavigate();
@@ -26,6 +26,20 @@ export function PetsPage() {
     return () => clearTimeout(t);
   }, [search]);
 
+  // ---- BUSCA (FIX) -------------------------------------------------
+  function normalizeText(v: any): string {
+    return String(v ?? "")
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function petSearchField(p: any): string {
+    const nome = p?.nome ?? p?.nomePet ?? p?.petNome ?? p?.name ?? "";
+    return normalizeText(nome);
+  }
+ 
   async function load(p = page, s = debouncedSearch) {
     try {
       setError(null);
@@ -36,6 +50,30 @@ export function PetsPage() {
         size: PAGE_SIZE,
         search: s,
       });
+
+
+      const term = normalizeText(s);
+      if (term && (result.items.length === 0 || result.total > 0)) {
+             const all = await petsService.list({
+          page: 1,
+          size: 1000,
+          search: "",
+        });
+
+        const filteredAll = (all.items as any[]).filter((pet) =>
+          petSearchField(pet).includes(term)
+        );
+
+        const totalLocal = filteredAll.length;
+        const start = (p - 1) * PAGE_SIZE;
+        const end = start + PAGE_SIZE;
+        const pageItems = filteredAll.slice(start, end) as Pet[];
+
+        setItems(pageItems);
+        setTotal(totalLocal);
+        return;
+      }
+      // -----------------------------------------------------------------
 
       setItems(result.items);
       setTotal(result.total);
@@ -49,14 +87,13 @@ export function PetsPage() {
     }
   }
 
-  // quando muda busca, volta para página 1
   useEffect(() => {
     setPage(1);
   }, [debouncedSearch]);
 
   useEffect(() => {
     void load(page, debouncedSearch);
-  }, [page, debouncedSearch]);
+     }, [page, debouncedSearch]);
 
   const totalPages = useMemo(() => {
     const n = Math.ceil((total || 0) / PAGE_SIZE);
@@ -213,7 +250,6 @@ export function PetsPage() {
                           className="h-full w-full object-cover"
                           loading="lazy"
                           onError={(e) => {
-                            // esconde a imagem quebrada e mostra fallback abaixo
                             e.currentTarget.style.display = "none";
                             const fb = e.currentTarget.parentElement?.querySelector(
                               '[data-fallback="1"]'
@@ -223,7 +259,6 @@ export function PetsPage() {
                         />
                       ) : null}
 
-                      {/* fallback: começa escondido e só aparece se não tiver foto ou quebrar */}
                       <div
                         data-fallback="1"
                         style={{ display: fotoUrl ? "none" : "flex" }}

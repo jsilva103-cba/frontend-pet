@@ -19,7 +19,7 @@ export function ProtectedRoute() {
 
   const authenticated = hasAccessToken();
 
-  // Se nao estiver autenticado volta /login
+  // Se nao estiver logado volta
   if (!authenticated) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }

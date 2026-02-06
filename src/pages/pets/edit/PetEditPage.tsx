@@ -44,16 +44,16 @@ export function PetEditPage() {
       setError(null);
       setSubmitting(true);
 
-      // 1) Atualiza dados do pet
+      //Atualiza dados do pet
       const updated = await petsService.update(petId, payload);
       const idOut = (updated as any)?.id ?? (updated as any)?._id ?? petId;
 
-      // 2) Se veio foto, faz upload após salvar
+     
       if (photo) {
         await petsService.uploadFoto(String(idOut), photo);
       }
 
-      // 3) Volta para o detalhe do pet
+      //Volta para o detalhe
       navigate(`/pets/${String(idOut)}`, { replace: true });
     } catch (e) {
       console.error("[PetEditPage] erro:", e);

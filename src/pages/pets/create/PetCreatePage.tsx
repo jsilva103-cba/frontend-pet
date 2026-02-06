@@ -46,7 +46,7 @@ export function PetCreatePage() {
           await petsService.uploadFoto(createdId, foto);
         } catch (uploadErr) {
           console.warn("[PetCreatePage] erro no upload da foto:", uploadErr);
-          // segue o fluxo: pet foi criado
+         
         }
       }
 
